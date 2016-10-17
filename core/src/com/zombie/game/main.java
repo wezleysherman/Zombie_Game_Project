@@ -1,5 +1,7 @@
 package com.zombie.game;
 
+import java.util.List;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -27,7 +29,7 @@ public class main extends ApplicationAdapter
 		cam = new OrthographicCamera(30,30*(Gdx.graphics.getWidth()/Gdx.graphics.getHeight()));
 		batch = new SpriteBatch();
 		background = new TextureRegion(new Texture("grass.png"));
-		mainPlayer = new Player(0, 0, 0, new TextureRegion(new Texture("player.png")), playerMoveSpeed);
+		mainPlayer = new Player(0, 0, 0, new TextureRegion(new Texture("player.png")), playerMoveSpeed, new TextureRegion(new Texture("grass.png")));
 		cam.setToOrtho(false, 800, 480);
 		pcController = new PCControls(mainPlayer, cam);
 		

@@ -47,6 +47,11 @@ public class PCControls extends Controls
 		{
 			super.moveRight(player.getMoveSpeed());
 		}
+		
+		if(Gdx.input.isButtonPressed(Keys.SPACE))
+		{
+			super.fireWeapon(new Weapon());
+		}
 	}
 	
 	private float computeRotation(Vector2 obj, Vector2 tar)

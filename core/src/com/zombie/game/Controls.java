@@ -10,7 +10,7 @@ public class Controls {
 	
 	public void fireWeapon(Weapon newWeapon)
 	{
-		
+		player.fireWeapon(newWeapon);
 	}
 	
 	public void moveUp(float speed)
