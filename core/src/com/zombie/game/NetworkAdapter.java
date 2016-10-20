@@ -27,7 +27,10 @@ public class NetworkAdapter
 				{
 					String messageRecieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
 					// clientSocker.getOutputStream().write("asd".getBytes()));
+<<<<<<< HEAD
 					String transmitPlayer1 = "120 291 129 1 B:129 B:130 B:131";
+=======
+>>>>>>> origin/master
 				}
 				catch(IOException e) 
 				{
@@ -39,6 +42,7 @@ public class NetworkAdapter
 	
 	public void createClient() 
 	{	
+<<<<<<< HEAD
 		new Thread(new Runnable()
 		{
 			
@@ -59,5 +63,19 @@ public class NetworkAdapter
 				}
 			}
 		}).start();
+=======
+		SocketHints clientHints = new SocketHints();
+
+		Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1111, clientHints);
+		try 
+		{
+			//client.getOutputStream().write("".getBytes());
+			 String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
+		} 
+		catch(IOException e) 
+		{
+			System.out.println("Exception!: " + e);
+		}
+>>>>>>> origin/master
 	}
 }
