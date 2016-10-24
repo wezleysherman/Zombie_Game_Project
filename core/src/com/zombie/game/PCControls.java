@@ -26,7 +26,7 @@ public class PCControls extends Controls
 		this.mainCam = cam;
 		this.mousePos = new Vector2();
 	}
-	
+	boolean alreadyConn = false;
 	public void checkInput() 
 	{
 		float rotation = computeRotation();

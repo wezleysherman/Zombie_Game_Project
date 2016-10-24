@@ -17,9 +17,11 @@ public class main extends ApplicationAdapter
 	SpriteBatch batch;
 	TextureRegion background;
 	Player mainPlayer;
+	Player clientPlayer;
 	OrthographicCamera cam;
 	PCControls pcController;
-	
+	NetworkAdapter netAdapt;
+
 	float playerMoveSpeed = 2f;
 	float playerCamBounds = 150.5f;
 	
@@ -30,8 +32,12 @@ public class main extends ApplicationAdapter
 		batch = new SpriteBatch();
 		background = new TextureRegion(new Texture("grass.png"));
 		mainPlayer = new Player(0, 0, 0, new TextureRegion(new Texture("player.png")), playerMoveSpeed, new TextureRegion(new Texture("grass.png")));
+		clientPlayer = new Player(-9999, -9999, 0, new TextureRegion(new Texture("zombie.png")), playerMoveSpeed, new TextureRegion(new Texture("grass.png")));
 		cam.setToOrtho(false, 800, 480);
 		pcController = new PCControls(mainPlayer, cam);
+		netAdapt = new NetworkAdapter(mainPlayer, clientPlayer);
+		
+		netAdapt.createServer();
 		
 	}
 	
@@ -73,7 +79,7 @@ public class main extends ApplicationAdapter
 		
 		drawMap();
 		mainPlayer.drawPlayer(batch);
-		
+		clientPlayer.drawPlayer(batch);
 		batch.end();
 	}
 	
@@ -97,6 +103,5 @@ public class main extends ApplicationAdapter
 	public void dispose () 
 	{
 		batch.dispose();
-		//player.dispose();
 	}
 }

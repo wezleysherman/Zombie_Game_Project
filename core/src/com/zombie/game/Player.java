@@ -35,9 +35,7 @@ public class Player extends DynamicObject
 	{
 		float xPos = getX();
 		float yPos = getY();
-		//batch.draw(playerTexture, xPos, yPos, super.getRot());
 		batch.draw(playerTexture, xPos, yPos, 0, 0, 32, 32, 1, 1, super.getRot());
-		//
 		BitmapFont debugRot = new BitmapFont();
 		debugRot.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		double screenHeight = Gdx.graphics.getHeight();
@@ -47,7 +45,6 @@ public class Player extends DynamicObject
 		{
 			updateBullets(batch);
 		}
-		//
 	}
 	
 	private void updateBullets(SpriteBatch batch)

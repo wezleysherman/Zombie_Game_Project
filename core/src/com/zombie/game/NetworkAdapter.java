@@ -12,6 +12,17 @@ import com.badlogic.gdx.net.SocketHints;
 
 public class NetworkAdapter 
 {
+	Player player;
+	Player clientPlayer;
+	boolean serverOpened;
+
+	public NetworkAdapter(Player player, Player client)
+	{
+		this.player = player;
+		this.clientPlayer = client;
+		serverOpened = true;
+	}
+	
 	public void createServer() 
 	{
 		new Thread(new Runnable() 
@@ -19,43 +30,68 @@ public class NetworkAdapter
 			@Override
 			public void run() 
 			{
+				System.out.println("Opening Server...");
 				ServerSocketHints servHints = new ServerSocketHints();
 				servHints.acceptTimeout = 0;
-				ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1111, servHints);
-				Socket clientSocket = serv.accept(null);
-				try
+				try {
+					ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1969, servHints);
+					Socket clientSocket = serv.accept(null);
+					try
+					{
+						while(serverOpened) {
+							String playerSend = buildString(player) + "\n";
+							String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
+							clientSocket.getOutputStream().write(playerSend.getBytes());
+							applyClient(response);
+						}					
+					}
+					catch(IOException e) 
+					{
+						System.out.println("Execption!: " + e);
+					}			
+				} 
+				catch (Exception e) 
 				{
-					String messageRecieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
-					// clientSocker.getOutputStream().write("asd".getBytes()));
-<<<<<<< HEAD
-					String transmitPlayer1 = "120 291 129 1 B:129 B:130 B:131";
-=======
->>>>>>> origin/master
-				}
-				catch(IOException e) 
-				{
-					System.out.println("Execption!: " + e);
+					
+					createClient();
 				}
 			}
 		}).start();
 	}
 	
+	private void applyClient(String recieveMessage)
+	{
+		String[] recieveData = recieveMessage.split("\\s+");
+		clientPlayer.setX(Float.parseFloat(recieveData[0]));
+		clientPlayer.setY(Float.parseFloat(recieveData[1]));
+		clientPlayer.setRot(Float.parseFloat(recieveData[2]));
+	}
+	
+	private String buildString(Player pObj)
+	{
+		return pObj.getX() + " " + pObj.getY() + " " + pObj.getRot();
+	}
+	
 	public void createClient() 
 	{	
-<<<<<<< HEAD
 		new Thread(new Runnable()
 		{
 			
 			@Override
 			public void run()
 			{
+				System.out.println("Opening Client");
 				SocketHints clientHints = new SocketHints();
 
-				Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1111, clientHints);
+				Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1969, clientHints);
 				try 
 				{
-					//client.getOutputStream().write("".getBytes());
-					String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
+					while(serverOpened) {
+						String playerSend = buildString(player) + "\n";
+						clientSocket.getOutputStream().write(playerSend.getBytes());
+						String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
+						applyClient(response);
+					}
 				} 
 				catch(IOException e) 
 				{
@@ -63,19 +99,5 @@ public class NetworkAdapter
 				}
 			}
 		}).start();
-=======
-		SocketHints clientHints = new SocketHints();
-
-		Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1111, clientHints);
-		try 
-		{
-			//client.getOutputStream().write("".getBytes());
-			 String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
-		} 
-		catch(IOException e) 
-		{
-			System.out.println("Exception!: " + e);
-		}
->>>>>>> origin/master
 	}
 }
