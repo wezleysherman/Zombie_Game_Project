@@ -9,7 +9,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 800;
 		config.height = 480;
-		config.title = "My Zombie Game WUT";
+		config.title = "SER 215 1v1 Battle";
 		new LwjglApplication(new main(), config);
 	}
 }

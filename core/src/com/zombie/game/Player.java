@@ -15,8 +15,11 @@ public class Player extends DynamicObject
 	TextureRegion playerTexture;
 	TextureRegion bulletTexture;
 	float playerMoveSpeed;
-    List<Bullet> bulletsInWorld = new ArrayList();
-
+    public List<Bullet> bulletsInWorld = new ArrayList();
+    List<Bullet> bulletsToSend = new ArrayList();
+    public int playerHealth = 100;
+    public int playerScore = 0;
+    
 	public Player(float x, float y, float rot, TextureRegion texture, float moveSpeed, TextureRegion bulletTex) 
 	{
 		super(x, y, rot);
@@ -35,12 +38,8 @@ public class Player extends DynamicObject
 	{
 		float xPos = getX();
 		float yPos = getY();
-		batch.draw(playerTexture, xPos, yPos, 0, 0, 32, 32, 1, 1, super.getRot());
-		BitmapFont debugRot = new BitmapFont();
-		debugRot.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-		double screenHeight = Gdx.graphics.getHeight();
-		String debugRotString = super.getRot() + ": " + super.getX() + " ," + (screenHeight - super.getY()) + "  " + Gdx.input.getX() + ", " + Gdx.input.getY();
-		debugRot.draw(batch, debugRotString, 20, 20);
+		batch.draw(playerTexture, xPos, yPos, 0, 0, 32, 32, 1, 1, super.getRot()-90);
+		
 		if(bulletsInWorld.size() > 0) 
 		{
 			updateBullets(batch);
@@ -49,13 +48,23 @@ public class Player extends DynamicObject
 	
 	private void updateBullets(SpriteBatch batch)
 	{
-		for(Bullet bul : bulletsInWorld)
-		{
-			batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 32, 32, 1, 1, bul.getRot());
-			float dirX = (float) Math.cos(Math.toRadians(bul.getRot()));
-			float dirY = (float) Math.sin(Math.toRadians(bul.getRot()));
-			bul.setX(bul.getX() + (dirX * 2));
-			bul.setY(bul.getY() + (dirY * 2));
+		System.out.println(bulletsInWorld.size());
+		for(int i = 0; i < bulletsInWorld.size(); i++)
+		{ 
+			Bullet bul = bulletsInWorld.get(i);
+			if(bul != null) 
+			{
+				float dist = calcDistance(bul.getPosVector(), this.getPosVector());
+				if(dist > 1280)
+				{
+					bulletsInWorld.remove(i);
+				}
+				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 16, 16, 1, 1, bul.getRot()-180);
+				float dirX = (float) Math.cos(Math.toRadians(bul.getRot()));
+				float dirY = (float) Math.sin(Math.toRadians(bul.getRot()));
+				bul.setX(bul.getX() + (dirX * 10));
+				bul.setY(bul.getY() + (dirY * 10));
+			}
 		}
 	}
 	
@@ -67,8 +76,9 @@ public class Player extends DynamicObject
 	public void fireWeapon(Weapon newWeapon)
 	{
 		float rotationVector = this.getRot();
-		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector);
+		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector, true);
 		bulletsInWorld.add(newBul);
+		bulletsToSend.add(newBul);
 	}
 	
 }

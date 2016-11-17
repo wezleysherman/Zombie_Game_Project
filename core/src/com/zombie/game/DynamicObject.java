@@ -49,4 +49,9 @@ public class DynamicObject {
 	{
 		return rotation;
 	}
+	
+	public float calcDistance(Vector2 vect1, Vector2 vect2) 
+	{
+		return (float) Math.sqrt(((vect1.x - vect2.x)*(vect1.x-vect2.x)) + ((vect1.y - vect2.y)*(vect1.y - vect2.y)));
+	}
 }

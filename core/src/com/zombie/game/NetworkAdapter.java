@@ -65,11 +65,23 @@ public class NetworkAdapter
 		clientPlayer.setX(Float.parseFloat(recieveData[0]));
 		clientPlayer.setY(Float.parseFloat(recieveData[1]));
 		clientPlayer.setRot(Float.parseFloat(recieveData[2]));
+		for(int i = 3; i < recieveData.length; i++) 
+		{
+			float rotationVector = clientPlayer.getRot();
+			Bullet newBul = new Bullet(clientPlayer.getX(), clientPlayer.getY(), rotationVector, false);
+			player.bulletsInWorld.add(newBul);
+		}
 	}
 	
 	private String buildString(Player pObj)
 	{
-		return pObj.getX() + " " + pObj.getY() + " " + pObj.getRot();
+		String returnString = pObj.getX() + " " + pObj.getY() + " " + pObj.getRot();
+		for(int i = 0; i < pObj.bulletsToSend.size(); i++) 
+		{
+			returnString += " B";
+			pObj.bulletsToSend.remove(i);
+		}
+		return returnString;
 	}
 	
 	public void createClient() 
