@@ -23,10 +23,10 @@ public class main extends ApplicationAdapter
 
 	int MAX_HEALTH = 100;
 	// Colliders
-	int BULLET_WIDTH_COL = 10;
-	int BULLET_HEIGHT_COL = 15;
-	int PLAYER_WIDTH_COL = 64;
-	int PLAYER_HEIGHT_COL = 64;
+	int BULLET_WIDTH_COL = 48;
+	int BULLET_HEIGHT_COL = 48;
+	int PLAYER_WIDTH_COL = 48;
+	int PLAYER_HEIGHT_COL = 48;
 	
 	float playerMoveSpeed = 2f;
 	float playerCamBounds = 150.5f;
@@ -77,22 +77,28 @@ public class main extends ApplicationAdapter
 		for(int i = 0; i < mainPlayer.bulletsInWorld.size(); i++)
 		{ 
 			Bullet bul = mainPlayer.bulletsInWorld.get(i);
-			float bulX = bul.getX();
-			float bulY = bul.getY();
-			float playX = mainPlayer.getX();
-			float playY = mainPlayer.getY();
-			float clientX = clientPlayer.getX();
-			float clientY = clientPlayer.getY();
+			Vector3 bulletProj = cam.project(new Vector3(bul.getX(), bul.getY(), 0));
+			Vector3 playProj = cam.project(new Vector3(mainPlayer.getX(), mainPlayer.getY(), 0));
+			Vector3 clientProj = cam.project(new Vector3(clientPlayer.getX(), clientPlayer.getY(), 0));
 			
-			if(bulX < (playX + PLAYER_WIDTH_COL) && bulX > (playX - PLAYER_WIDTH_COL) && bulY < (playY + PLAYER_HEIGHT_COL) &&
-					bulY > (playX - PLAYER_WIDTH_COL) && !bul.getFriendly())
+			float bulX = bulletProj.x;
+			float bulY = bulletProj.y;
+			float playX = playProj.x;
+			float playY = playProj.y;
+			float clientX = clientProj.x;
+			float clientY = clientProj.y;
+			
+			if(playX < (bulX+BULLET_WIDTH_COL) && playX > (bulX-BULLET_WIDTH_COL) &&
+						playY < (bulY+BULLET_HEIGHT_COL) && playY > (bulY-BULLET_WIDTH_COL) && !bul.getFriendly())
 			{
-				mainPlayer.playerHealth -= 10;
+				mainPlayer.playerHealth -= bul.getDamage();
+				mainPlayer.bulletsInWorld.remove(i);
 			} 
-			else if(bulX < (clientX + PLAYER_WIDTH_COL) && bulX > (clientX - PLAYER_WIDTH_COL) && bulY < (clientY + PLAYER_HEIGHT_COL) &&
-					bulY > (clientX - PLAYER_WIDTH_COL) && bul.getFriendly())
+			if(clientX < (bulX+BULLET_WIDTH_COL) && clientX > (bulX-BULLET_WIDTH_COL) &&
+					clientY < (bulY+BULLET_HEIGHT_COL) && clientY > (bulY-BULLET_WIDTH_COL) && bul.getFriendly())
 			{
-				clientPlayer.playerHealth -= 10;
+				clientPlayer.playerHealth -= bul.getDamage();
+				mainPlayer.bulletsInWorld.remove(i);
 			}
 		}
 	}

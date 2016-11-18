@@ -27,6 +27,7 @@ public class Player extends DynamicObject
 		this.playerMoveSpeed = moveSpeed;
 		this.bulletTexture = bulletTex;
 		loadPlayer();
+		
 	}
 
 	void loadPlayer()
@@ -38,7 +39,7 @@ public class Player extends DynamicObject
 	{
 		float xPos = getX();
 		float yPos = getY();
-		batch.draw(playerTexture, xPos, yPos, 0, 0, 32, 32, 1, 1, super.getRot()-90);
+		batch.draw(playerTexture, xPos, yPos, 0, 0, 48, 48, 1, 1, super.getRot()-90);
 		
 		if(bulletsInWorld.size() > 0) 
 		{
@@ -48,7 +49,6 @@ public class Player extends DynamicObject
 	
 	private void updateBullets(SpriteBatch batch)
 	{
-		System.out.println(bulletsInWorld.size());
 		for(int i = 0; i < bulletsInWorld.size(); i++)
 		{ 
 			Bullet bul = bulletsInWorld.get(i);
@@ -59,7 +59,7 @@ public class Player extends DynamicObject
 				{
 					bulletsInWorld.remove(i);
 				}
-				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 32, 32, 1, 1, bul.getRot()-90);
+				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 48, 48, 1, 1, bul.getRot()-90);
 				float dirX = (float) Math.cos(Math.toRadians(bul.getRot()));
 				float dirY = (float) Math.sin(Math.toRadians(bul.getRot()));
 				bul.setX(bul.getX() + (dirX * 10));
@@ -76,7 +76,7 @@ public class Player extends DynamicObject
 	public void fireWeapon(Weapon newWeapon)
 	{
 		float rotationVector = this.getRot();
-		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector, true);
+		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector, true, 20);
 		bulletsInWorld.add(newBul);
 		bulletsToSend.add(newBul);
 	}

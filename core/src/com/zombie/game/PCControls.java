@@ -47,7 +47,7 @@ public class PCControls extends Controls
 			super.moveRight(player.getMoveSpeed());
 		}
 		
-		if(Gdx.input.isKeyPressed(Keys.SPACE))
+		if(Gdx.input.isKeyJustPressed(Keys.SPACE))
 		{
 			super.fireWeapon(new Weapon());
 		}

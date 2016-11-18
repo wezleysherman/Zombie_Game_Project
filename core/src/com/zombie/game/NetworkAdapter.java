@@ -68,7 +68,7 @@ public class NetworkAdapter
 		for(int i = 3; i < recieveData.length; i++) 
 		{
 			float rotationVector = clientPlayer.getRot();
-			Bullet newBul = new Bullet(clientPlayer.getX(), clientPlayer.getY(), rotationVector, false);
+			Bullet newBul = new Bullet(clientPlayer.getX(), clientPlayer.getY(), rotationVector, false, 20);
 			player.bulletsInWorld.add(newBul);
 		}
 	}
