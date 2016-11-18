@@ -59,7 +59,7 @@ public class Player extends DynamicObject
 				{
 					bulletsInWorld.remove(i);
 				}
-				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 16, 16, 1, 1, bul.getRot()-180);
+				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 32, 32, 1, 1, bul.getRot()-90);
 				float dirX = (float) Math.cos(Math.toRadians(bul.getRot()));
 				float dirY = (float) Math.sin(Math.toRadians(bul.getRot()));
 				bul.setX(bul.getX() + (dirX * 10));

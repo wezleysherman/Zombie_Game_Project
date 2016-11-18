@@ -12,12 +12,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.springsource.ide.eclipse.gradle.core.nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<variableList>
-		<variable>
-			<name>assets</name>
-			<value>file:/Users/Wezley/Documents/zombiegame/core/assets</value>
-		</variable>
-	</variableList>
 </projectDescription>
