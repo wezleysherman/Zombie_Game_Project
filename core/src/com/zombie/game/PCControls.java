@@ -13,6 +13,8 @@ public class PCControls extends Controls
     int inputKeyBackward = Keys.S;
     int inputKeyLeft = Keys.A;
     int inputKeyRight = Keys.D;
+    int inputKeyFire = Keys.SPACE;
+    
     Camera mainCam;
 	Player player;
 	Vector2 mousePos;
@@ -47,7 +49,7 @@ public class PCControls extends Controls
 			super.moveRight(player.getMoveSpeed());
 		}
 		
-		if(Gdx.input.isKeyJustPressed(Keys.SPACE))
+		if(Gdx.input.isKeyJustPressed(inputKeyFire))
 		{
 			super.fireWeapon(new Weapon());
 		}

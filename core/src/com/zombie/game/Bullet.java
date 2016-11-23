@@ -6,6 +6,9 @@ public class Bullet extends DynamicObject
 {
 	private boolean isFriendly;
 	private float damage;
+	private String ammoType; // Future implementation
+    private int ammoSpeed; // Future implementation
+	
 	public Bullet(float x, float y, float rot, boolean isFriendly, float damage)
 	{
 		super(x, y, rot);
@@ -18,9 +21,16 @@ public class Bullet extends DynamicObject
 		return isFriendly;
 	}
 	
-	public float getDamage()
-	{
-		return damage;
+	public String getAmmoType(){
+         return ammoType;
+	}
+	
+	public int getAmmoSpeed(){
+         return ammoSpeed;
+	}
+	
+	public float getAmmoDamage(){
+         return damage;
 	}
 	
 	public void setDamage(float newDamage)

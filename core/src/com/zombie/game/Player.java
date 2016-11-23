@@ -26,12 +26,6 @@ public class Player extends DynamicObject
 		this.playerTexture = texture;
 		this.playerMoveSpeed = moveSpeed;
 		this.bulletTexture = bulletTex;
-		loadPlayer();
-		
-	}
-
-	void loadPlayer()
-	{
 		
 	}
 	

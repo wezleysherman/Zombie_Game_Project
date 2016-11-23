@@ -33,12 +33,14 @@ public class NetworkAdapter
 				System.out.println("Opening Server...");
 				ServerSocketHints servHints = new ServerSocketHints();
 				servHints.acceptTimeout = 0;
-				try {
+				try 
+				{
 					ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1969, servHints);
 					Socket clientSocket = serv.accept(null);
 					try
 					{
-						while(serverOpened) {
+						while(serverOpened) 
+						{
 							String playerSend = buildString(player) + "\n";
 							String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
 							clientSocket.getOutputStream().write(playerSend.getBytes());
@@ -98,7 +100,8 @@ public class NetworkAdapter
 				Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1969, clientHints);
 				try 
 				{
-					while(serverOpened) {
+					while(serverOpened)
+					{
 						String playerSend = buildString(player) + "\n";
 						clientSocket.getOutputStream().write(playerSend.getBytes());
 						String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();

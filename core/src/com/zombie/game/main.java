@@ -15,6 +15,7 @@ public class main extends ApplicationAdapter
 {
 	SpriteBatch batch;
 	TextureRegion background;
+	TextureRegion wall;
 	Player mainPlayer;
 	Player clientPlayer;
 	OrthographicCamera cam;
@@ -37,6 +38,7 @@ public class main extends ApplicationAdapter
 		cam = new OrthographicCamera(30,30*(Gdx.graphics.getWidth()/Gdx.graphics.getHeight()));
 		batch = new SpriteBatch();
 		background = new TextureRegion(new Texture("grass.png"));
+		wall = new TextureRegion(new Texture("brick.png"));
 		mainPlayer = new Player(0, 0, 0, new TextureRegion(new Texture("player.png")), playerMoveSpeed, new TextureRegion(new Texture("bullet.png")));
 		clientPlayer = new Player(-9999, -9999, 0, new TextureRegion(new Texture("zombie.png")), playerMoveSpeed, new TextureRegion(new Texture("bullet.png")));
 		cam.setToOrtho(false, 800, 480);
@@ -91,13 +93,13 @@ public class main extends ApplicationAdapter
 			if(playX < (bulX+BULLET_WIDTH_COL) && playX > (bulX-BULLET_WIDTH_COL) &&
 						playY < (bulY+BULLET_HEIGHT_COL) && playY > (bulY-BULLET_WIDTH_COL) && !bul.getFriendly())
 			{
-				mainPlayer.playerHealth -= bul.getDamage();
+				mainPlayer.playerHealth -= bul.getAmmoDamage();
 				mainPlayer.bulletsInWorld.remove(i);
 			} 
 			if(clientX < (bulX+BULLET_WIDTH_COL) && clientX > (bulX-BULLET_WIDTH_COL) &&
 					clientY < (bulY+BULLET_HEIGHT_COL) && clientY > (bulY-BULLET_WIDTH_COL) && bul.getFriendly())
 			{
-				clientPlayer.playerHealth -= bul.getDamage();
+				clientPlayer.playerHealth -= bul.getAmmoDamage();
 				mainPlayer.bulletsInWorld.remove(i);
 			}
 		}
@@ -131,7 +133,7 @@ public class main extends ApplicationAdapter
 		cam.unproject(textCoords);
 		cam.update();
 		batch.setProjectionMatrix(cam.combined);
-		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClearColor(25/255f, 25/255f, 112/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		drawMap();
@@ -144,11 +146,31 @@ public class main extends ApplicationAdapter
 
 	void drawMap()
 	{
-		for(int i = 0; i < cam.viewportWidth/background.getRegionWidth(); i++) {
-			for(int j = 0; j < cam.viewportHeight/background.getRegionHeight(); j++) {
-				batch.draw(background, background.getRegionWidth()*i, background.getRegionHeight()*j);
+		//Due to the way the map is generated, these draws are needed for all corners except for the bottom left.
+		batch.draw(wall, -64, 512);
+		batch.draw(wall, 832, -64);
+		batch.draw(wall, 832, 512);
+		
+		//Iterates through the length and width of the map to create grass and walls. Starts at -1 for the walls.
+		for(int i = -1; i < cam.viewportWidth/background.getRegionWidth(); i++) {
+			for(int j = -1; j < cam.viewportHeight/background.getRegionHeight(); j++) {
+				
+				//If the x or y position of the map is 0, then it is a border, and a wall should be drawn instead.
+				if ( i < 0 || j < 0)
+				{
+					//Draws walls on left and bottom.
+					batch.draw(wall, wall.getRegionWidth()*i, wall.getRegionHeight()*j);
+				}
+				else
+				{
+					//Draws the grass, and also the walls on the right and top.
+					batch.draw(background, background.getRegionWidth()*i, background.getRegionHeight()*j);
+					batch.draw(wall, wall.getRegionWidth()*i, 512);
+					batch.draw(wall, 832, wall.getRegionHeight()*j);
+				}
 			}
 		}
+		
 	}
 	
 	@Override

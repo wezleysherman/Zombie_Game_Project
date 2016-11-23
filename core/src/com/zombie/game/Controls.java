@@ -15,24 +15,48 @@ public class Controls {
 	
 	public void moveUp(float speed)
 	{
+		//Collision testing
+		if(player.getY() + speed >= 512)
+		{
+			speed = 0;
+		}
+				
 		float newYPos = player.getY() + speed;
 		player.setY(newYPos);
 	}
 	
 	public void moveDown(float speed)
 	{
+		//Collision testing
+		if(player.getY() - speed <= 0)
+		{
+			speed = 0;
+		}
+		
 		float newYPos = player.getY() - speed;
 		player.setY(newYPos);
 	}
 	
 	public void moveLeft(float speed)
 	{
+		//Collision testing
+		if(player.getX() - speed <= 0)
+		{
+			speed = 0;
+		}
+		
 		float newXPos = player.getX() - speed;
 		player.setX(newXPos);
 	}
 	
 	public void moveRight(float speed)
 	{
+		//Collision testing
+		if(player.getX() + speed >= 832)
+		{
+			speed = 0;
+		}
+		
 		float newXPos = player.getX() + speed;
 		player.setX(newXPos);
 	}
