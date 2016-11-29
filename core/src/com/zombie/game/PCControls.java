@@ -19,6 +19,8 @@ public class PCControls extends Controls
 	Player player;
 	Vector2 mousePos;
 	
+	boolean alreadyConn = false;
+
 	public PCControls(Player p, Camera cam)
 	{
 		super(p);
@@ -26,7 +28,8 @@ public class PCControls extends Controls
 		this.mainCam = cam;
 		this.mousePos = new Vector2();
 	}
-	boolean alreadyConn = false;
+	
+	// Method used to check for user input across the various `inputKey` variables.
 	public void checkInput() 
 	{
 		float rotation = computeRotation();
@@ -53,22 +56,18 @@ public class PCControls extends Controls
 		{
 			super.fireWeapon(new Weapon());
 		}
-		Vector3 point = mainCam.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-
-		if(Gdx.input.isKeyPressed(Keys.L))
-		{
-			System.out.println("Mouse Pos: (" + point.x + ", " + point.y + ") Player: (" + player.getX() + ", " + player.getY()+") + " + rotation);
-		
-		}
 	}
 	
 
 	private float computeRotation()
 	{
+		// Unproject the position vector of the mouse position relative to the camera on the screen.
 		Vector3 point = mainCam.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+		// Turn the player position into a Vector3.
 		Vector3 objPos = new Vector3(player.getX(), player.getY(), 0);
 		
-	    float angle = (float)((Math.atan2(point.y - objPos.y, point.x - objPos.x) * (180/Math.PI)));
+		// Compute the rotation angle between the player and the mouse cursor.
+	    float angle = (float)((Math.atan2(point.y - objPos.y, point.x - objPos.x) * (180.0F / Math.PI)));
 	    
 		return angle;
 	}

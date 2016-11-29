@@ -12,10 +12,15 @@ import com.badlogic.gdx.net.SocketHints;
 
 public class NetworkAdapter 
 {
+	// Create variables for the player and client.
 	Player player;
 	Player clientPlayer;
+	// Tells us if the server is opened.
 	boolean serverOpened;
-
+	public ServerSocketHints servHints;
+	public SocketHints clientHints;
+	
+	// Set the player and client options and set `serverOpened` to true.
 	public NetworkAdapter(Player player, Player client)
 	{
 		this.player = player;
@@ -23,28 +28,34 @@ public class NetworkAdapter
 		serverOpened = true;
 	}
 	
+	// Whoever connects to the port first is automatically declared the server.
+	// The next connection becomes the client.
 	public void createServer() 
 	{
-		new Thread(new Runnable() 
+		serverOpened = true;
+		new Thread(new Runnable() // Create a new thread for the server
 		{
 			@Override
 			public void run() 
 			{
 				System.out.println("Opening Server...");
-				ServerSocketHints servHints = new ServerSocketHints();
+				servHints = new ServerSocketHints();
 				servHints.acceptTimeout = 0;
+				// Attempt to open a new server on port '1979'
+				// If the port is already in use then attempt to connect as the client.
 				try 
 				{
-					ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1969, servHints);
+					ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1979, servHints);
 					Socket clientSocket = serv.accept(null);
 					try
 					{
+						// If the server was created successfully enter a loop to send data between the server and client
 						while(serverOpened) 
 						{
 							String playerSend = buildString(player) + "\n";
-							String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
+							String responseString = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
 							clientSocket.getOutputStream().write(playerSend.getBytes());
-							applyClient(response);
+							applyClient(responseString);
 						}					
 					}
 					catch(IOException e) 
@@ -61,6 +72,8 @@ public class NetworkAdapter
 		}).start();
 	}
 	
+	// Apply the data send between players to the other player object
+	// Create new bullets if they are sent over
 	private void applyClient(String recieveMessage)
 	{
 		String[] recieveData = recieveMessage.split("\\s+");
@@ -75,6 +88,7 @@ public class NetworkAdapter
 		}
 	}
 	
+	// Builds the string of information to send over the server
 	private String buildString(Player pObj)
 	{
 		String returnString = pObj.getX() + " " + pObj.getY() + " " + pObj.getRot();
@@ -86,26 +100,39 @@ public class NetworkAdapter
 		return returnString;
 	}
 	
+	// Creates a client to connect to the server
+	// If client disconnects form the server then it automatically becomes to the server.
 	public void createClient() 
 	{	
 		new Thread(new Runnable()
 		{
-			
 			@Override
 			public void run()
 			{
 				System.out.println("Opening Client");
-				SocketHints clientHints = new SocketHints();
-
-				Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1969, clientHints);
+				clientHints = new SocketHints();
+				// Attempt to create a socket and connect to port '1979'
+				Socket clientSocket = Gdx.net.newClientSocket(Protocol.TCP, "localhost", 1979, clientHints);
 				try 
 				{
+					// If connection is successful -- send data to the server
 					while(serverOpened)
 					{
 						String playerSend = buildString(player) + "\n";
 						clientSocket.getOutputStream().write(playerSend.getBytes());
-						String response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
-						applyClient(response);
+						String responseString = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
+						try 
+						{
+							applyClient(responseString);
+						} 
+						catch(Exception e)
+						{
+							serverOpened = false;
+							clientPlayer.setX(9999);
+							clientPlayer.setY(9999);
+							createServer();
+							clientSocket.dispose();
+						}
 					}
 				} 
 				catch(IOException e) 

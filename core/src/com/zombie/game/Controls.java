@@ -1,6 +1,8 @@
 package com.zombie.game;
 
-public class Controls {
+// Parent class of various Controls options (Allows multiplatform expansion)
+public class Controls 
+{
 	Player player;
 	
 	public Controls(Player p)

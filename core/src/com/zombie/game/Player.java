@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Player extends DynamicObject 
 {
+	// Various variable initializers
 	TextureRegion playerTexture;
 	TextureRegion bulletTexture;
 	float playerMoveSpeed;
@@ -22,57 +23,56 @@ public class Player extends DynamicObject
     
 	public Player(float x, float y, float rot, TextureRegion texture, float moveSpeed, TextureRegion bulletTex) 
 	{
-		super(x, y, rot);
-		this.playerTexture = texture;
-		this.playerMoveSpeed = moveSpeed;
-		this.bulletTexture = bulletTex;
+		super(x, y, rot); //create dynamic object for player object
+		this.playerTexture = texture; //set texture for player
+		this.playerMoveSpeed = moveSpeed; //set player move speed
+		this.bulletTexture = bulletTex; //set bullet texture
 		
 	}
 	
 	public void drawPlayer(SpriteBatch batch) 
 	{
-		float xPos = getX();
-		float yPos = getY();
-		batch.draw(playerTexture, xPos, yPos, 0, 0, 48, 48, 1, 1, super.getRot()-90);
+		float xPos = getX(); //get player object's x coordinate
+		float yPos = getY(); //get player boject's y coordinate
+		batch.draw(playerTexture, xPos, yPos, 0, 0, 32, 32, 1, 1, super.getRot()-90); //draw player at position with rotation
 		
-		if(bulletsInWorld.size() > 0) 
+		if(bulletsInWorld.size() > 0) //if there are bullets in world
 		{
-			updateBullets(batch);
+			updateBullets(batch);//update positions of bullets in world
 		}
 	}
 	
 	private void updateBullets(SpriteBatch batch)
 	{
-		for(int i = 0; i < bulletsInWorld.size(); i++)
+		for(int i = 0; i < bulletsInWorld.size(); i++)  //iterate through bullets present in world
 		{ 
-			Bullet bul = bulletsInWorld.get(i);
+			Bullet bul = bulletsInWorld.get(i); //retrieve bullet object from list
 			if(bul != null) 
 			{
-				float dist = calcDistance(bul.getPosVector(), this.getPosVector());
-				if(dist > 1280)
+				float dist = calcDistance(bul.getPosVector(), this.getPosVector());  //get distance between bullet and player object
+				if(dist > 1280)//if bullet is a total distance of 1280 from the player
 				{
-					bulletsInWorld.remove(i);
+					bulletsInWorld.remove(i);  //remove bullet from world
 				}
-				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 48, 48, 1, 1, bul.getRot()-90);
-				float dirX = (float) Math.cos(Math.toRadians(bul.getRot()));
-				float dirY = (float) Math.sin(Math.toRadians(bul.getRot()));
-				bul.setX(bul.getX() + (dirX * 10));
-				bul.setY(bul.getY() + (dirY * 10));
+				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 32, 32, 1, 1, bul.getRot()-90);  //create bullet visual
+				float bDirX = (float) Math.cos(Math.toRadians(bul.getRot()));   //calculate change in x position
+				float bDirY = (float) Math.sin(Math.toRadians(bul.getRot()));   //calculate change in y position
+				bul.setX(bul.getX() + (bDirX * 10)); //update x position
+				bul.setY(bul.getY() + (bDirY * 10)); //update y position
 			}
 		}
 	}
 	
 	public float getMoveSpeed()
 	{
-		return playerMoveSpeed;
+		return playerMoveSpeed; //return move speed of player
 	}
 	
 	public void fireWeapon(Weapon newWeapon)
 	{
-		float rotationVector = this.getRot();
-		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector, true, 20);
-		bulletsInWorld.add(newBul);
-		bulletsToSend.add(newBul);
+		float rotationVector = this.getRot();     //get rotation of player object, set as rotation of buller
+		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector, true, 20);   //create bullet at position of player and rotation of player
+		bulletsInWorld.add(newBul);   //add bullet to world
+		bulletsToSend.add(newBul);    //add bullet to send list
 	}
-	
 }

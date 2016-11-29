@@ -1,8 +1,8 @@
 package com.zombie.game;
 
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -13,7 +13,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class main extends ApplicationAdapter 
 {
-	SpriteBatch batch;
+	// Various variables for graphics and networking
+	SpriteBatch spBatch;
 	TextureRegion background;
 	TextureRegion wall;
 	Player mainPlayer;
@@ -21,22 +22,28 @@ public class main extends ApplicationAdapter
 	OrthographicCamera cam;
 	PCControls pcController;
 	NetworkAdapter netAdapt;
-
+    // initial player health
 	int MAX_HEALTH = 100;
+	
 	// Colliders
 	int BULLET_WIDTH_COL = 48;
 	int BULLET_HEIGHT_COL = 48;
 	int PLAYER_WIDTH_COL = 48;
 	int PLAYER_HEIGHT_COL = 48;
 	
+	//Player variables for speed and camera bounds
 	float playerMoveSpeed = 2f;
 	float playerCamBounds = 150.5f;
-
+	
+	boolean gameStarted = false;
+	boolean gameEnded = false;
+	
+	// Main engine method to initialize all graphics and server/client connections
 	@Override
 	public void create () 
 	{
 		cam = new OrthographicCamera(30,30*(Gdx.graphics.getWidth()/Gdx.graphics.getHeight()));
-		batch = new SpriteBatch();
+		spBatch = new SpriteBatch();
 		background = new TextureRegion(new Texture("grass.png"));
 		wall = new TextureRegion(new Texture("brick.png"));
 		mainPlayer = new Player(0, 0, 0, new TextureRegion(new Texture("player.png")), playerMoveSpeed, new TextureRegion(new Texture("bullet.png")));
@@ -46,9 +53,9 @@ public class main extends ApplicationAdapter
 		netAdapt = new NetworkAdapter(mainPlayer, clientPlayer);
 		
 		netAdapt.createServer();
-		
 	}
 	
+	// Update camera position, check for inputs, and check for health/damage
 	public void updateLoop() 
 	{
 		updateCameraPosition();
@@ -57,6 +64,7 @@ public class main extends ApplicationAdapter
 		checkBulletsPos();
 	}
 	
+	// Check player health, if the player dies then reset their position to (0, 0)
 	private void checkPlayerHealths()
 	{
 		if(mainPlayer.playerHealth <= 0) 
@@ -72,8 +80,15 @@ public class main extends ApplicationAdapter
 			mainPlayer.playerScore++;
 			clientPlayer.playerHealth = MAX_HEALTH;
 		}
+
+		if(clientPlayer.playerScore >= 20 || mainPlayer.playerScore >= 20)
+		{
+			gameEnded = true;
+		}
 	}
 	
+	// Loop through the bullets in the world and check to see if they have collided with the player or client, 
+	// then determine if damage needs to be taken.
 	private void checkBulletsPos()
 	{
 		for(int i = 0; i < mainPlayer.bulletsInWorld.size(); i++)
@@ -105,6 +120,7 @@ public class main extends ApplicationAdapter
 		}
 	}
 	
+	// Translate the camera if the player moves outside of the camera's bounding box.
 	private void updateCameraPosition() 
 	{
 		Vector3 playerPos = new Vector3(mainPlayer.getX(), mainPlayer.getY(), 0);
@@ -127,29 +143,68 @@ public class main extends ApplicationAdapter
 		}
 	}
 	
+	// Loop used to draw the players and the map.
 	public void drawLoop() 
 	{
 		Vector3 textCoords = new Vector3(10, 10, 0);
 		cam.unproject(textCoords);
 		cam.update();
-		batch.setProjectionMatrix(cam.combined);
+		spBatch.setProjectionMatrix(cam.combined);
 		Gdx.gl.glClearColor(25/255f, 25/255f, 112/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
+		spBatch.begin();
 		drawMap();
-		mainPlayer.drawPlayer(batch);
-		clientPlayer.drawPlayer(batch);
-		BitmapFont hudFont = new BitmapFont();
-		hudFont.draw(batch, "Health: " + mainPlayer.playerHealth + "\nScore: " + mainPlayer.playerScore, textCoords.x, textCoords.y);
-		batch.end();
+		// If the game has started and not ended -- draw the players and hud
+		if(gameStarted == true && gameEnded == false)
+		{
+			mainPlayer.drawPlayer(spBatch);
+			clientPlayer.drawPlayer(spBatch);
+			BitmapFont hudFont = new BitmapFont();
+			hudFont.draw(spBatch, "Health: " + mainPlayer.playerHealth + "\nScore: " + mainPlayer.playerScore, textCoords.x, textCoords.y);
+		}
+		else if(gameEnded == false)
+		{
+			// main menu -- enter to continue -- escape to quit
+			BitmapFont menuFont = new BitmapFont();
+			menuFont.draw(spBatch, "Press 'ENTER' to start \n\n\n Press 'ESC' to exit",Gdx.app.getGraphics().getWidth()/2-50, Gdx.app.getGraphics().getHeight()/2+75);
+			if(Gdx.input.isKeyPressed(Keys.ENTER))
+			{
+				gameStarted = true;
+			}
+			else if(Gdx.input.isKeyPressed(Keys.ESCAPE))
+			{
+				Gdx.app.exit();
+			}
+		}
+		else if(gameEnded == true)
+		{
+			// If one of the players reaches a score of 20, display the end game dialogue
+			BitmapFont gameOverFont = new BitmapFont();
+			if(mainPlayer.playerScore == 20)
+			{
+				gameOverFont.draw(spBatch, "Game over! \n You win!!! \n\n Press 'Space' to restart",Gdx.app.getGraphics().getWidth()/2, Gdx.app.getGraphics().getHeight()/2+75);
+			}
+			else
+			{
+				gameOverFont.draw(spBatch, "Game over! \n You lose!!! \n\n Press 'Space' to restart",Gdx.app.getGraphics().getWidth()/2, Gdx.app.getGraphics().getHeight()/2+75);
+			}
+			
+			if(Gdx.input.isKeyPressed(Keys.SPACE))
+			{
+				mainPlayer.playerScore = 0;
+				clientPlayer.playerScore = 0;
+				gameEnded = false;
+			}
+		}
+		spBatch.end();
 	}
 
 	void drawMap()
 	{
 		//Due to the way the map is generated, these draws are needed for all corners except for the bottom left.
-		batch.draw(wall, -64, 512);
-		batch.draw(wall, 832, -64);
-		batch.draw(wall, 832, 512);
+		spBatch.draw(wall, -64, 512);
+		spBatch.draw(wall, 832, -64);
+		spBatch.draw(wall, 832, 512);
 		
 		//Iterates through the length and width of the map to create grass and walls. Starts at -1 for the walls.
 		for(int i = -1; i < cam.viewportWidth/background.getRegionWidth(); i++) {
@@ -159,30 +214,36 @@ public class main extends ApplicationAdapter
 				if ( i < 0 || j < 0)
 				{
 					//Draws walls on left and bottom.
-					batch.draw(wall, wall.getRegionWidth()*i, wall.getRegionHeight()*j);
+					spBatch.draw(wall, wall.getRegionWidth()*i, wall.getRegionHeight()*j);
 				}
 				else
 				{
 					//Draws the grass, and also the walls on the right and top.
-					batch.draw(background, background.getRegionWidth()*i, background.getRegionHeight()*j);
-					batch.draw(wall, wall.getRegionWidth()*i, 512);
-					batch.draw(wall, 832, wall.getRegionHeight()*j);
+					spBatch.draw(background, background.getRegionWidth()*i, background.getRegionHeight()*j);
+					spBatch.draw(wall, wall.getRegionWidth()*i, 512);
+					spBatch.draw(wall, 832, wall.getRegionHeight()*j);
 				}
 			}
 		}
 		
 	}
 	
+	// Render the game, and execute the draw loop and update loop
 	@Override
 	public void render () 
 	{
 		drawLoop();
-		updateLoop();
+		// Only update the game if it is not the main menu and the game has not ended.
+		if(gameStarted == true && gameEnded == false) 
+		{
+			updateLoop();
+		}
 	}
 	
+	// Dispose of the game
 	@Override
 	public void dispose () 
 	{
-		batch.dispose();
+		spBatch.dispose();
 	}
 }
