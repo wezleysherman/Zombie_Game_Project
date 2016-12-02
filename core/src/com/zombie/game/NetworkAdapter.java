@@ -1,6 +1,5 @@
 package com.zombie.game;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import com.badlogic.gdx.Gdx;
@@ -17,7 +16,7 @@ public class NetworkAdapter
 	Player clientPlayer;
 	// Tells us if the server is opened.
 	boolean serverOpened;
-	public ServerSocketHints servHints;
+	public ServerSocketHints serverHints;
 	public SocketHints clientHints;
 	
 	// Set the player and client options and set `serverOpened` to true.
@@ -39,33 +38,33 @@ public class NetworkAdapter
 			public void run() 
 			{
 				System.out.println("Opening Server...");
-				servHints = new ServerSocketHints();
-				servHints.acceptTimeout = 0;
+				serverHints = new ServerSocketHints();
+				serverHints.acceptTimeout = 0;
 				// Attempt to open a new server on port '1979'
 				// If the port is already in use then attempt to connect as the client.
 				try 
 				{
-					ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1979, servHints);
+					ServerSocket serv = Gdx.net.newServerSocket(Protocol.TCP, 1979, serverHints);
 					Socket clientSocket = serv.accept(null);
 					try
 					{
 						// If the server was created successfully enter a loop to send data between the server and client
 						while(serverOpened) 
 						{
-							String playerSend = buildString(player) + "\n";
+							byte[] playerSend = (buildString(player) + "\n").getBytes();
 							String responseString = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
-							clientSocket.getOutputStream().write(playerSend.getBytes());
+							clientSocket.getOutputStream().write(playerSend);
 							applyClient(responseString);
 						}					
 					}
-					catch(IOException e) 
+					catch(Exception e) 
 					{
 						System.out.println("Execption!: " + e);
 					}			
 				} 
 				catch (Exception e) 
 				{
-					
+					// if unable to create a server on the port -- create a client
 					createClient();
 				}
 			}
@@ -118,14 +117,14 @@ public class NetworkAdapter
 					// If connection is successful -- send data to the server
 					while(serverOpened)
 					{
-						String playerSend = buildString(player) + "\n";
-						clientSocket.getOutputStream().write(playerSend.getBytes());
+						byte[] playerSend = (buildString(player) + "\n").getBytes();
+						clientSocket.getOutputStream().write(playerSend);
 						String responseString = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())).readLine();
 						try 
 						{
 							applyClient(responseString);
 						} 
-						catch(Exception e)
+						catch(Exception e) // If the server has disconnected -- relaunch networking as a server
 						{
 							serverOpened = false;
 							clientPlayer.setX(9999);
@@ -135,7 +134,7 @@ public class NetworkAdapter
 						}
 					}
 				} 
-				catch(IOException e) 
+				catch(Exception e) 
 				{
 					System.out.println("Exception!: " + e);
 				}

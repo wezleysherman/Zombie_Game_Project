@@ -3,12 +3,8 @@ package com.zombie.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 public class Player extends DynamicObject 
 {
@@ -27,7 +23,6 @@ public class Player extends DynamicObject
 		this.playerTexture = texture; //set texture for player
 		this.playerMoveSpeed = moveSpeed; //set player move speed
 		this.bulletTexture = bulletTex; //set bullet texture
-		
 	}
 	
 	public void drawPlayer(SpriteBatch batch) 
@@ -55,8 +50,11 @@ public class Player extends DynamicObject
 					bulletsInWorld.remove(i);  //remove bullet from world
 				}
 				batch.draw(bulletTexture, bul.getX(), bul.getY(), 0, 0, 32, 32, 1, 1, bul.getRot()-90);  //create bullet visual
-				float bDirX = (float) Math.cos(Math.toRadians(bul.getRot()));   //calculate change in x position
-				float bDirY = (float) Math.sin(Math.toRadians(bul.getRot()));   //calculate change in y position
+				// Add velocity to the bullet
+				float radX = (float) (bul.getRot() * (Math.PI/180)); // Convert the rotations from euler to radians
+				float radY = (float) (bul.getRot() * (Math.PI/180)); // Convert the rotations from euler to radians
+				float bDirX = (float) Math.cos(radX);   //calculate change in x position
+				float bDirY = (float) Math.sin(radY);   //calculate change in y position
 				bul.setX(bul.getX() + (bDirX * 10)); //update x position
 				bul.setY(bul.getY() + (bDirY * 10)); //update y position
 			}
@@ -70,7 +68,7 @@ public class Player extends DynamicObject
 	
 	public void fireWeapon(Weapon newWeapon)
 	{
-		float rotationVector = this.getRot();     //get rotation of player object, set as rotation of buller
+		float rotationVector = this.getRot();     //get rotation of player object, set as rotation of bullet
 		Bullet newBul = new Bullet(this.getX(), this.getY(), rotationVector, true, 20);   //create bullet at position of player and rotation of player
 		bulletsInWorld.add(newBul);   //add bullet to world
 		bulletsToSend.add(newBul);    //add bullet to send list
